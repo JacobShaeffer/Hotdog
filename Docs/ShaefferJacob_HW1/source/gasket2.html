@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+<title>American Flag Sierpinski Gasket</title>
+
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute vec4 vPosition;
+varying vec4 color;
+
+void
+main()
+{
+	float x = vPosition.x;
+	float y = vPosition.y;
+	float dist = sqrt(pow(x,2.0)+pow(y,2.0));
+	float theta = radians(45.0);
+	
+	float xPrime = x * cos(dist * theta) - y * sin(dist * theta);
+    float yPrime = x * sin(dist * theta) + y * cos(dist * theta);
+	
+	gl_Position.x = xPrime;
+	gl_Position.y = yPrime;
+    gl_Position.z = 0.0;
+    gl_Position.w = 1.0;
+	
+	vec4 red = vec4(1.0, 0.0, 0.0, 1.0);
+	vec4 white = vec4(0.9, 0.9, 0.9, 1.0);
+	
+	if(xPrime <= 0.0 && yPrime >= 0.0)
+	{
+		color = vec4( 0.0, 0.0, 1.0, 1.0 );
+	}
+	else
+	{
+		if(yPrime >= 0.0 && yPrime < 0.1429)
+			color = red;
+		else if(yPrime >= 0.1429 && yPrime < 0.2857)
+			color = white;
+		else if(yPrime >= 0.2857 && yPrime < 0.4286)
+			color = red;
+		else if(yPrime >= 0.4286 && yPrime < 0.5714)
+			color = white;
+		else if(yPrime >= 0.5714 && yPrime < 0.7143)
+			color = red;
+		else if(yPrime >= 0.7143 && yPrime < 0.8571)
+			color = white;
+		else if(yPrime >= 0.8571 && yPrime < 1.0)
+			color = red;
+		else if(yPrime < 0.0 && yPrime >= -0.1429)
+			color = white;
+		else if(yPrime < -0.1429 && yPrime >= -0.2857)
+			color = red;
+		else if(yPrime < -0.2857 && yPrime >= -0.4286)
+			color = white;
+		else if(yPrime < -0.4286 && yPrime >= -0.5714)
+			color = red;
+		else if(yPrime < -0.5714 && yPrime >= -0.7143)
+			color = white;
+		else if(yPrime < -0.7143 && yPrime >= -0.8571)
+			color = red;
+		else if(yPrime < -0.8571 && yPrime > -1.0)
+			color = white;
+		else 
+			color = vec4( 1.0, 1.0, 1.0, 1.0 );
+	}
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+varying vec4 color;
+
+void
+main()
+{
+    gl_FragColor = color;
+}
+</script>
+
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="gasket2.js"></script>
+</head>   
+
+<body>
+<h1>CSE 470 HW#1: Sierpinski Gasket Triwl & Color</h1>
+<p><strong>Author:</strong> Jacob Shaeffer &nbsp &nbsp &nbsp <strong>Date:</strong> January 24, 2017<p>
+<p><Strong>Description:</strong> This program displays a Sierpinski Gasket after it has been morphed and colored.</p>
+<p><strong>Functionality:</strong></p>
+<ul>
+	<li>First each vertex of the original gasket is rotated based on its distance from the origin(The center of the canvas).</li>
+	<li>The equations used to determine rotation are:</li> 
+	<ul>
+		<li>x' = x * cos(dist * theta) - y * sin(dist * theta)</li>
+		<li>y' = x * sin(dist * theta) + y * cos(dist * theta)</li>
+		<li>Where theta = 45 degrees & dist = sqrt(x^2 + y^2)</li>
+	</ul>
+	<br>
+	<li>These new verticies are then colored based on their location in the canvas.</li>
+	<li>The effect is meant to resemble the American flag.</li>
+</ul>
+<p><strong>Parameters:</strong></p>
+<ul>
+	<li>The variable NumTimesToSubdivide in gasket2.js controlls the number of times each triangle is sub divided.</li>
+	<li>The verticies, also in gasket2.js, will change the starting position of the triangle before it is morphed.</li>
+</ul>
+<p><strong>Recources:</strong> The code by Professor Angel.</p>
+<canvas id="gl-canvas" width="512" height="512">
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+
+attribute vec4 vPosition;
+attribute vec4 vNormal;
+
+varying vec4 fColor;
+
+uniform vec4 ambientProduct, diffuseProduct, specularProduct;
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+uniform vec4 lightPosition;
+uniform float shininess;
+
+//CSE470 rotation values
+uniform vec3 theta;
+uniform vec3 translation;
+
+void
+main()
+{
+	//CSE470 calculate rotation
+	vec3 angles = radians( theta );
+    vec3 c = cos( angles );
+    vec3 s = sin( angles );
+    mat4 rx = mat4( 1.0,  0.0,  0.0, 0.0,
+					0.0,  c.x,  s.x, 0.0,
+					0.0, -s.x,  c.x, 0.0,
+					0.0,  0.0,  0.0, 1.0 );
+    mat4 ry = mat4( c.y, 0.0, -s.y, 0.0,
+					0.0, 1.0,  0.0, 0.0,
+					s.y, 0.0,  c.y, 0.0,
+					0.0, 0.0,  0.0, 1.0 );
+    mat4 rz = mat4( c.z, -s.z, 0.0, 0.0,
+					s.z,  c.z, 0.0, 0.0,
+					0.0,  0.0, 1.0, 0.0,
+					0.0,  0.0, 0.0, 1.0 );
+								
+	mat4 translationMatrix = mat4( 1.0, 0.0, 0.0, translation.x,
+								   0.0, 1.0, 0.0, translation.y,
+								   0.0, 0.0, 1.0, translation.z,
+								   0.0, 0.0, 0.0, 1.0 );
+
+
+    vec3 pos = -(modelViewMatrix * vPosition).xyz;
+    vec3 light = lightPosition.xyz;
+    vec3 L = normalize( light - pos );
+
+	
+    vec3 E = normalize( -pos );
+    vec3 H = normalize( L + E );
+
+    
+    // Transform vertex normal into eye coordinates
+    
+ 
+    vec3 N = normalize( (modelViewMatrix*vNormal).xyz);
+
+    // Compute terms in the illumination equation
+    vec4 ambient = ambientProduct;
+
+    float Kd = max( dot(L, N), 0.0 );
+    vec4  diffuse = Kd*diffuseProduct;
+
+    float Ks = pow( max(dot(N, H), 0.0), shininess );
+    vec4  specular = Ks * specularProduct;
+    
+    if( dot(L, N) < 0.0 ) {
+		specular = vec4(0.0, 0.0, 0.0, 1.0);
+    } 
+
+    gl_Position = rz * ry * rx * projectionMatrix * modelViewMatrix * vPosition * translationMatrix;
+    
+    fColor = ambient + diffuse + specular;
+
+    fColor.a = 1.0;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+precision mediump float;
+
+varying vec4 fColor;
+
+void
+main()
+{
+
+    gl_FragColor = fColor;
+
+}
+</script>
+
+<p> </p>
+<!--button id = "Button0">Increase R</button>
+<button id = "Button1">Decrease R</button>
+
+<p> </p>
+<button id = "Button2">Increase theta</button>
+<button id = "Button3">Decrease theta</button>
+<button id = "Button4">Increase phi</button>
+<button id = "Button5">Decrease phi</button>
+<p> </p>
+<button id = "Button6">Increase Subdivisions</button>
+<button id = "Button7">Decrease Subdivisions</button-->
+
+<!-- HW470 buttons to do tasks layed out in the pdf -->
+<button id="ToggleLightColor">Toggle Light Color</button>
+<p id="TLCp"><strong>Light Color: </strong>White</p>
+<button id="ChangeMaterialProperty">Change Material Property</button>
+<p id="CMPp"><strong>Materials: </strong>Gold & Red Plastic</p>
+<button id="ChangeSurfaceRotation">Change Surface Rotation</button>
+<button id="AnimateLight">Animate Light</button>
+<!--button id="DollyZoom">Dolly Zoom</button--><!-- Dolly Zoom -->
+
+<p></p>
+
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="HW3.js"></script>
+
+<body>
+<canvas id="gl-canvas" width="512" height="512">
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+<p><strong>Name:</strong> Jacob Shaeffer</p>
+<p><strong>Date:</strong> 4/5/2017</p>
+<p><strong>Description:</strong> Here two object rotate while a light shades the onjects. The first button above will toggle the light <br>color between white and purple. The second button changes the material properties of the object between three <br>settings. The third and fourth buttons change the axis of rotation of the object and toggles the light animating respectively</p>
+<p><strong>Material Description:</strong> See above </p>
+<p><strong>Recources:</strong> Proffesor Angel's code, as well as help from <a href="https://webglfundamentals.org/">https://webglfundamentals.org</a></p>
+</body>
+</html>
