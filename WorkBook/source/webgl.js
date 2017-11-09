@@ -3,12 +3,6 @@ var canvas;
 var gl;
 
 var origin = mat4();
-var transformMatrix = new Float32Array([
-    1.0, 0.0, 0.0, 1.0,
-    0.0, 1.0, 0.0, 1.0,
-    0.0, 0.0, 1.0, 1.0,
-    0.0, 0.0, 0.0, 1.0  
-]);
 
 var NumVertices  = 36;
 
@@ -30,17 +24,26 @@ var cubes = [];
 var numCubes = 0;
 
 var fovy = 60.0;
-var aspect = 1.0;
-var near = 1.0;
+var aspect = 4/3;
+var near = 2.0;
 var far = 500.0;
 
 
 var radius = 1;
 var theta = 0;
 var phi = 0;
-var eye;// = vec3(0.0, 0.0, 1.0);
+var eyeX = 0.0;
+var eyeY = 2.0;
+var eyeZ = 3.0;
+var eye;// = vec3(0.0, 1.0, 1.0);
 var at = vec3(0.0, 0.0, 0.0);
 var up = vec3(0.0, 1.0, 0.0);
+
+
+var incRad =  0;
+var incThe =  0;
+var incPhi =  0;
+
 
 var program;
 
@@ -69,11 +72,15 @@ window.onload = function init()
     var vColor = gl.getAttribLocation( program, "vColor" );
     gl.vertexAttribPointer( vColor, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vColor );
+    
+	modelViewMatrixLoc = gl.getUniformLocation( program, "modelViewMatrix" );
+	projectionMatrixLoc = gl.getUniformLocation( program, "projectionMatrix" );
 	
     scaleLoc = gl.getUniformLocation(program, 'scale');
     
-    for(var i=0; i<25; i++)
+    for(var i=0; i<=124; i++)
         addCube(i);
+    //addCube(62);
 
     var vBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
@@ -98,18 +105,37 @@ window.onload = function init()
     document.getElementById( "right" ).onmouseup   = () => { yRotation =  0; };
     document.getElementById( "left"  ).onmousedown = () => { yRotation = -1; };
     document.getElementById( "left"  ).onmouseup   = () => { yRotation =  0; };
+
+    document.getElementById( "radius+" ).onmousedown = () => { incRad =  1; console.log("incRad: " + incRad); };
+    document.getElementById( "radius+" ).onmouseup   = () => { incRad =  0; };
+    document.getElementById( "theta+"  ).onmousedown = () => { incThe =  1; console.log("incRad: " + incThe); };
+    document.getElementById( "theta+"  ).onmouseup   = () => { incThe =  0; };
+    document.getElementById( "phi+"    ).onmousedown = () => { incPhi =  1; console.log("incRad: " + incPhi); };
+    document.getElementById( "phi+"    ).onmouseup   = () => { incPhi =  0; };
+    document.getElementById( "radius-" ).onmousedown = () => { incRad = -1; console.log("incRad: " + incRad); };
+    document.getElementById( "radius-" ).onmouseup   = () => { incRad =  0; };
+    document.getElementById( "theta-"  ).onmousedown = () => { incThe = -1; console.log("incRad: " + incThe); };
+    document.getElementById( "theta-"  ).onmouseup   = () => { incThe =  0; };
+    document.getElementById( "phi-"    ).onmousedown = () => { incPhi = -1; console.log("incRad: " + incPhi); };
+    document.getElementById( "phi-"    ).onmouseup   = () => { incPhi =  0; };
         
     render();
 }
 
 function addCube(number){
     var x = (number % 5.0) * 2.0;
-    var z = (- Math.floor(number / 5.0) - 3.0) * 2.0;
-    var y = -4.0 * 0.25;
+    var y = (Math.floor(number / 25.0)) * 2.0;
+    var z = (- Math.floor((number%25) / 5.0) - 3.0) * 2.0;
+
     x -= 4.0;
+    y -= 4.0;
+
     x = x*0.25;
-    z = z*0.25;
+    y = y*0.25;
+    z = z*0.25 + 1;
     numCubes++;
+
+    console.log(number + ": " + JSON.stringify({x:x, y:y, z:z}));
 
     cubes.push(
         {
@@ -170,13 +196,20 @@ function render()
     rotation[1] += yRotation;
     gl.uniform3fv(rotationLoc, rotation);
 
+    
+    radius += incRad * Math.PI / 180;
+    theta += incThe * Math.PI / 180;
+    phi += incPhi * Math.PI / 180;
+
+    eyeX += incRad * 0.1;// * Math.PI / 180;
+    eyeY += incThe * 0.1;// * Math.PI / 180;
+    eyeZ += incPhi * 0.1;// * Math.PI / 180;
+
     eye = vec3(radius * Math.sin(theta) * Math.cos(phi), radius * Math.sin(theta) * Math.sin(phi), radius * Math.cos(theta));
+    //eye = vec3(eyeX, eyeY, eyeZ);
 
     modelViewMatrix = lookAt(eye, at , up);
     projectionMatrix = perspective(fovy, aspect, near, far);
-
-	modelViewMatrixLoc = gl.getUniformLocation( program, "modelViewMatrix" );
-	projectionMatrixLoc = gl.getUniformLocation( program, "projectionMatrix" );
 			
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix) );
     gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix) );
@@ -207,13 +240,12 @@ function renderCube(cubeID)
     var y = radius * Math.sin(theta) * Math.sin(phi);
     var z = radius * Math.cos(theta);
 
-    if(a < 20){
+    /*if(a < 20){
         console.log("shpereicalOrigin:      " + radius, theta, phi);
         console.log("cubeOrigin:            " + JSON.stringify(cubeOrigin));
         console.log("shpereicalToCartesian: " + JSON.stringify({x:x, y:y, z:z}));
         a++;
-    }
-    */
+    }*/
     
     var scaling = cubes[cubeID].scale;
     var scaleMatrix = new Float32Array([
@@ -223,7 +255,16 @@ function renderCube(cubeID)
         0.0,     0.0,     0.0,     1.0  
     ]);
 
-    scaleMatrix = mult(scaleMatrix, transformMatrix);
+    /*
+    var transformMatrix = new Float32Array([
+        0.0, 0.0, 0.0, 0.0,//scaleX, 0,      0,      transformX
+        0.0, 0.0, 0.0, 0.0,//0,      scaleY, 0,      transformY
+        0.0, 0.0, 0.0, 0.0,//0,      0,      scaleZ, transformZ
+        0.0, 0.0, 0.0, 0.0,//0,      0,      0,      0
+    ]);
+
+    scaleMatrix = add(scaleMatrix, transformMatrix);
+    */
 
     gl.uniformMatrix4fv(scaleLoc, false, scaleMatrix);
     gl.drawArrays( gl.TRIANGLES, 0, NumVertices );
