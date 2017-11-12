@@ -2,38 +2,22 @@ const vShader = `
 attribute vec4 vPosition;
 attribute vec4 vColor;
 varying vec4 fColor;
+uniform vec3 translate;
 uniform mat4 scale;
-uniform vec3 rotation;
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
 
 void main() 
 {
-    // Compute the sines and cosines of theta for each of
-    //   the three axes in one computation.
-    vec3 angles = radians( rotation );
-    vec3 c = cos( angles );
-    vec3 s = sin( angles );
+    mat4 translateMatrix = mat4(
+        1.0, 0.0, 0.0, translate.x,
+        0.0, 1.0, 0.0, translate.y,
+        0.0, 0.0, 1.0, translate.z,
+        0.0, 0.0, 0.0, 1.0
+    );
 
-    // Remeber: thse matrices are column-major
-    mat4 rx = mat4( 1.0,  0.0,  0.0, 0.0,
-            0.0,  c.x,  s.x, 0.0,
-            0.0, -s.x,  c.x, 0.0,
-            0.0,  0.0,  0.0, 1.0 );
-
-    mat4 ry = mat4( c.y, 0.0, -s.y, 0.0,
-            0.0, 1.0,  0.0, 0.0,
-            s.y, 0.0,  c.y, 0.0,
-            0.0, 0.0,  0.0, 1.0 );
-
-
-    mat4 rz = mat4( c.z, -s.z, 0.0, 0.0,
-            s.z,  c.z, 0.0, 0.0,
-            0.0,  0.0, 1.0, 0.0,
-            0.0,  0.0, 0.0, 1.0 );
-
+    gl_Position = scale * translateMatrix * vPosition;// * projectionMatrix * modelViewMatrix; 
     fColor = vColor;
-    gl_Position = vPosition * scale * projectionMatrix * modelViewMatrix;//rz * ry * rx * 
 } 
 `;
 

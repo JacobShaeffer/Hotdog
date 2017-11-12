@@ -1,0 +1,89 @@
+
+body { 
+    margin: 0; 
+}
+
+canvas {
+    position: absolute;
+}
+
+button.link {
+    background: none;
+    border: 1px solid gray;
+}
+
+button.link:hover {
+    background: rgba( 0, 0, 0, 0.2 );
+}
+
+button.link#singlePlayer {
+    padding-left: 21px;
+    padding-right: 21px;
+}
+
+button#localMultiplayer {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+button#onlineMultiplayer {
+    padding-left: 6px;
+    padding-right: 6px;
+}
+
+button.gameUI {
+    background: none;
+    border: 1px solid black;
+}
+
+.permenant {
+    z-index: 1000;
+}
+
+.temporary {
+    z-index: 1000;
+}
+
+.hide {
+    z-index: 1000;
+}
+
+.absolute {
+    position: absolute;
+}
+
+.overlay {
+    width: 100%;
+    top: 50%;
+}
+
+.centerDiv {
+    left: 50%;
+    transform: translate( -50%, 0 );
+}
+
+.verticalCenter {
+    transform: translate( 0, -50% );
+}
+
+.horizontalCenter {
+    /*transform: translate( -50%, 0 );*/
+    text-align: center;
+}
+
+.bottom {
+    bottom: 0%;
+}
+
+.centerDiv #mainTitle {
+    font-size: 40px;
+}
+
+.centerDiv #attribution {
+    font-size: 12px;
+    color: rgb(100, 100, 100);
+}
+
+.blackBorder {
+    outline: 1px solid black;
+}
