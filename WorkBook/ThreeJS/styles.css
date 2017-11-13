@@ -34,18 +34,7 @@ button#onlineMultiplayer {
 button.gameUI {
     background: none;
     border: 1px solid black;
-}
-
-.permenant {
-    z-index: 1000;
-}
-
-.temporary {
-    z-index: 1000;
-}
-
-.hide {
-    z-index: 1000;
+    
 }
 
 .absolute {
@@ -86,4 +75,26 @@ button.gameUI {
 
 .blackBorder {
     outline: 1px solid black;
+}
+
+.above {
+    z-index: 1000;
+}
+
+
+.permenant {
+    display: inline-block;
+}
+
+.temporary {
+    display: inline-block;
+}
+
+.start_hidden {
+    display: none;
+}
+
+
+#turnDisplay{
+    font-size: 32px;
 }

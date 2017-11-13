@@ -12,17 +12,18 @@
 	<body>
 		<div class="container-fluid">
 			<div class="row">
-				<div class="col-md-0 absolute centerDiv temporary">
+				<div class="col-md-0 absolute centerDiv above temporary">
 					<div id="mainTitle">HOTDOG</div>
 					<div id="subTitle">a 3D Connect-4 style game</div>
+				</div>
+				<div class="col-md-0 absolute centerDiv above start_hidden" style="top: 5%;">
+				</div>
+				<div class="col-md-0 absolute centerDiv above start_hidden horizontalCenter" style="top: 5%;">
+					<div id="turnDisplay"></div>
 					<button class="gameUI" id="endTurn">End Turn</button>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col-md-0 absolute centerDiv hide">
-				</div>
-			</div>
-			<div class="row overlay absolute temporary">
+			<div class="row overlay absolute above temporary">
 				<div class="col-md-4 verticalCenter">
 					<div class="row">
 						<div class="col-md-6 col-md-offset-3 horizontalCenter">
@@ -61,7 +62,7 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-md-0 absolute permenant centerDiv bottom">
+				<div class="col-md-0 absolute above permenant centerDiv bottom">
 					<div class="bottom" id="attribution">made with THREE.js</div>
 				</div>
 			</div>

@@ -1,6 +1,12 @@
+//
+// Game Controls and 
+//
+
 var isPlaying;
 var playmode;
 const SINGLEPLAYER = 0, LOCALMULTIPLAYER = 1, ONLINEMULTIPLAYER = 2;
+var gameState = {};
+var cubeIsSelected = [];
 
 function initialSetup(){
     isPlaying = false;
@@ -8,6 +14,7 @@ function initialSetup(){
     document.getElementById( "singlePlayer" ).addEventListener( "click", singlePlayerSetup, false );
     document.getElementById( "localMultiplayer" ).addEventListener( "click", localMultiplayerSetup, false );
     document.getElementById( "onlineMultiplayer" ).addEventListener( "click", onlineMultiplayerSetup, false );
+    document.getElementById( "endTurn" ).addEventListener( "click", endTurn, false );
 }
 
 function singlePlayerSetup(){
@@ -16,7 +23,21 @@ function singlePlayerSetup(){
 }
 
 function localMultiplayerSetup(){
+    gameState = {
+        currentPlayer: 0,
+        playerColors:[
+            0xff0000,//player1 color
+            0xffff00,//player2 color
+        ],
+
+    };
     UISetup( LOCALMULTIPLAYER );
+    startPlaying();
+}
+
+function convertColor( color ){
+    console.log(color.toString(16));
+    return "#" + color.toString(16);
 }
 
 function onlineMultiplayerSetup(){
@@ -24,24 +45,99 @@ function onlineMultiplayerSetup(){
     UISetup( ONLINEMULTIPLAYER );
 }
 
-function UISetup( playmodePARAM ){
-    playmode = playmodePARAM;
-    for(var element of document.querySelectorAll(".temporary")){
-        element.style.zIndex = -1000;
-    }
-    document.querySelector(".hide").style.zIndex = 1000;
-    switch(playmode){
-        case SINGLEPLAYER:
-            break;
-        case LOCALMULTIPLAYER:
-            break;
-        case ONLINEMULTIPLAYER:
-            break;
-    }
+function startPlaying(){
     resetGameBoard();
     isPlaying = true;
     controls.enabled = true;
 }
+
+function UISetup( playmodePARAM ){
+    playmode = playmodePARAM;
+    for(var element of document.querySelectorAll(".temporary")){
+        element.style.display = "none";
+    }
+    for(var element of document.querySelectorAll(".start_hidden")){
+        element.style.display = "inline-block";
+    }
+    switch(playmode){
+        case SINGLEPLAYER:
+            break;
+        case LOCALMULTIPLAYER:
+            document.getElementById( "turnDisplay" ).innerHTML = "Player One's Turn";
+            document.getElementById( "turnDisplay" ).style.color = convertColor( gameState.playerColors[gameState.currentPlayer] );
+            break;
+        case ONLINEMULTIPLAYER:
+            break;
+    }
+}
+
+function endTurn(){
+    //toggle currentPlayer
+    gameState.currentPlayer = gameState.currentPlayer == 0 ? 1 : 0;
+    
+    selected.material.transparent = false;
+    selected.isSelectable = false;
+    var num = selected.number;
+    cubeIsSelected[num] = true;
+    addCube( num + 25, scene );
+    selected = null;
+
+    switch(playmode){
+        case SINGLEPLAYER:
+            break;
+        case LOCALMULTIPLAYER:
+            document.getElementById( "turnDisplay" ).innerHTML = gameState.currentPlayer == 0 ? "Player One's Turn" : "Player Two's Turn";
+            document.getElementById( "turnDisplay" ).style.color = convertColor( gameState.playerColors[gameState.currentPlayer] );
+            break;
+        case ONLINEMULTIPLAYER:
+            break;
+    }
+
+    detectWinConditions( num );
+}
+
+function detectWinConditions( latestSelected ){
+    
+}
+
+function mouseInteractionHandler( event ) {
+    if(isPlaying == false){
+        return;
+    }
+
+    //TODO: make this better
+
+    var rect = renderer.domElement.getBoundingClientRect();
+    mouse.x = ( ( event.clientX - rect.left ) / ( rect.width - rect.left ) ) * 2 - 1;
+    mouse.y = - ( ( event.clientY - rect.top ) / ( rect.bottom - rect.top) ) * 2 + 1;
+    
+    raycaster.setFromCamera( mouse, camera );
+    
+    var intersects = raycaster.intersectObjects( scene.children );
+
+    console.log( intersects.length );    
+    
+    
+    if(intersects.length > 0){
+        console.log(intersects[0].object.isSelectable);
+        if(intersects[0].object.isSelectable == false){
+            return;
+        }
+        if(selected != null){
+            selected.material.color.set( 0x333333 );
+        }
+        selected = intersects[0].object;
+        selected.material.color.set( gameState.playerColors[gameState.currentPlayer] );
+        //console.log(JSON.stringify(selected.material));
+    }
+
+}
+
+document.addEventListener( 'click', mouseInteractionHandler, false);
+
+//
+// Rendering functions and variables, and Camera Interaction Controls
+//
 
 var camera, scene;
 var renderer, controls;
@@ -101,6 +197,16 @@ function initializeGameBoard(){
 }
 
 function resetGameBoard(){
+    cubeIsSelected = new Array(5);
+    for(var i=0; i<5; i++){
+        cubeIsSelected[i] = new Array(5);
+        for(var j=0; j<5; j++){
+            cubeIsSelected[i][j] = new Array(5);
+            for(var k=0; k<5; k++){
+                cubeIsSelected[i][j][k] = false;
+            }
+        }
+    }
     while(scene.children.length > 0){
         scene.remove(scene.children[0]);
     }
@@ -108,6 +214,7 @@ function resetGameBoard(){
 }
 
 function addCube( number, scene ){
+    if(number >= 125) return;
     var geometry = new THREE.BoxGeometry( 1, 1, 1 );
     var material = new THREE.MeshLambertMaterial( { color: 0x333333, transparent: true, opacity: 0.5 } );
 
@@ -147,32 +254,6 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
     renderer.setSize( window.innerWidth, window.innerHeight );
 }
-
-document.addEventListener( 'click', function( event ) {
-    if(isPlaying == false){
-        return;
-    }
-    var rect = renderer.domElement.getBoundingClientRect();
-    mouse.x = ( ( event.clientX - rect.left ) / ( rect.width - rect.left ) ) * 2 - 1;
-    mouse.y = - ( ( event.clientY - rect.top ) / ( rect.bottom - rect.top) ) * 2 + 1;
-    
-    console.log("mouseClick");
-    raycaster.setFromCamera( mouse, camera );
-    
-    var intersects = raycaster.intersectObjects( scene.children );
-    
-    if(intersects.length > 0){
-        if(selected != null){
-            selected.material.color.set( 0x333333 );
-        }
-        selected = intersects[0].object;
-        selected.material.color.set( 0xff0000 );
-        //console.log(JSON.stringify(selected.material));
-        selected.material.transparent = false;
-        addCube( selected.number + 25, scene );
-    }
-
-}, false);
 
 initialSetup();
 initializeGameBoard();

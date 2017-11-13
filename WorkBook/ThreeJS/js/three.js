@@ -16000,6 +16000,7 @@ THE SOFTWARE.
 		this.drawMode = TrianglesDrawMode;
 
 		this.number = number;
+		this.isSelectable = true;
 
 		this.updateMorphTargets();
 
