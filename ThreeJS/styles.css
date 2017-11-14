@@ -41,9 +41,18 @@ button.gameUI {
     position: absolute;
 }
 
-.overlay {
-    width: 100%;
-    top: 50%;
+@media only screen and (min-width: 992px)  {
+    .overlay {
+        width: 100%;
+        top: 50%;
+    }
+}
+
+@media only screen and (max-width: 991px)  {
+    .overlay {
+        width: 100%;
+        top: 25%;
+    }
 }
 
 .centerDiv {

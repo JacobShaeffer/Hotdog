@@ -6,11 +6,19 @@
 		<title>Hotdog 0.3.0</title>
 		<link rel="stylesheet" href="styles.css">
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+		<!-- External dependancies -->
 		<script src="https://www.gstatic.com/firebasejs/4.6.2/firebase-app.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/4.6.2/firebase-auth.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/4.6.2/firebase-database.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+		<!-- Internal dependancies and source files -->
+		<script src="js/three.js"></script>
+		<script src="js/orbitControls.js"></script>
+		<script src="js/rendering.js"></script>
+		<script src="js/webHandler.js"></script>
 	</head>
 	<body>
 		<div class="container-fluid">
@@ -18,8 +26,6 @@
 				<div class="col-md-0 absolute centerDiv above temporary">
 					<div id="mainTitle">HOTDOG</div>
 					<div id="subTitle">a 3D Connect-4 style game</div>
-				</div>
-				<div class="col-md-0 absolute centerDiv above start_hidden" style="top: 5%;">
 				</div>
 				<div class="col-md-0 absolute centerDiv above start_hidden horizontalCenter" style="top: 5%;">
 					<div id="turnDisplay"></div>
@@ -46,7 +52,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="col-md-4 col-md-offset-4 verticalCenter">
+				<div class="hidden-sm hidden-xs col-md-4 col-md-offset-4 verticalCenter">
 					<div class="row">
 						<div class="col-md-4 col-md-offset-4">
 							Rules
@@ -54,7 +60,7 @@
 					</div>
 					<div class="row">
 						<div class="col-md-6 col-md-offset-3 blackBorder">
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eros ante, tincidunt eget blandit id, semper vel diam. Nulla ut odio id justo tincidunt elementum. Nam et elit diam. Maecenas dapibus hendrerit nisi ut condimentum. Duis fermentum vehicula nisl, ut iaculis dolor facilisis ac. Nullam diam nunc, scelerisque eu tellus in, congue vestibulum tellus. Nunc at euismod dui, sit amet tempor tortor. Aenean congue eu ante nec convallis. Aliquam et nibh tempor, sollicitudin odio nec, finibus mi. Proin vel finibus dui, vitae convallis urna. Morbi varius nisi vel tellus ullamcorper euismod.
+							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis fermentum vehicula nisl, ut iaculis dolor facilisis ac. Nullam diam nunc, scelerisque eu tellus in, congue vestibulum tellus. Nunc at euismod dui, sit amet tempor tortor. Aenean congue eu ante nec convallis. Aliquam et nibh tempor, sollicitudin odio nec, finibus mi. Proin vel finibus dui, vitae convallis urna. Morbi varius nisi vel tellus ullamcorper euismod.
 						</div>
 					</div>
 				</div>
@@ -70,6 +76,7 @@
 				</div>
 			</div>
 		</div>
+		
 		<script>
 			// Initialize Firebase
 			var config = {
@@ -80,8 +87,6 @@
 			};
 			firebase.initializeApp(config);
 		</script>
-		<script src="js/three.js"></script>
-		<script src="js/orbitControls.js"></script>
 		<script src="js/app.js"></script>
 	</body>
 </html>
