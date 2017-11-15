@@ -6,7 +6,7 @@ function createRoom( public ){
     console.log("creating room");
     getUsedRooms(( inuse ) => {
         console.log("retrieved active room list");
-        findUsableRoom(( roomNumber ) => {
+        findUsableRoom( inuse, ( roomNumber ) => {
             console.log("actually creating room now");
             database.ref( 'rooms/' + roomNumber ).set({
                 public: public,
@@ -77,7 +77,11 @@ function joinRandomRoom(){
  */
 function getOpenRooms( callback ){
     database.ref('openRooms/').once( 'value' ).then((snapshot) =>{
-        callback(snapshot.val());
+        var numberOpen = [];
+        snapshot.forEach( (childSnap) => {
+            numberOpen.push(childSnap.key);
+        });
+        callback(numberOpen);
     });
 }
 
@@ -87,8 +91,11 @@ function getOpenRooms( callback ){
  */
 function getUsedRooms( callback ){
     database.ref('openRooms/').once( 'value' ).then((snapshot) =>{
-        console.log(snapshot.val());
-        callback(snapshot.val());
+        var numbersInUse = [];
+        snapshot.forEach( (childSnap) => {
+            numbersInUse.push(childSnap.key);
+        });
+        callback(numbersInUse);
     });
 }
 
@@ -110,10 +117,11 @@ function setLastSelected( roomNumber, number ){
 // Miscellaneous functions
 //
 
-function findUsableRoom( inuse ){
+function findUsableRoom( inuse, callback ){
     var roomNumber = Math.floor(Math.random()*10000);
+    console.log("inuse: "+inuse[0]);
     while(inuse.indexOf(roomNumber) > -1){//FIXME: indexOf os apparently not a function
         roomNumber = Math.floor(Math.random()*10000);
     }
-    return roomNumber;
+    callback( roomNumber );
 }
