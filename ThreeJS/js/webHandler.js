@@ -7,7 +7,6 @@ function createRoom( public ){
     getUsedRooms(( inuse ) => {
         console.log("retrieved active room list");
         findUsableRoom( inuse, ( roomNumber ) => {
-            console.log("actually creating room now");
             database.ref( 'rooms/' + roomNumber ).set({
                 public: public,
                 appState: {
@@ -19,22 +18,43 @@ function createRoom( public ){
                     you: "",
                 },
             });
+
+            //TODO: update ui
+            //-remove the left over buttons
+            //-place the room number on screen
+            //-put "Playername VS ..." and make the elipse cycle
         
             var lastSelectedRef = database.ref( 'rooms/' + roomNumber +'/appState/lastSelected' );
             var playersRef = database.ref( 'rooms/' + roomNumber + '/players' );
         
             lastSelectedRef.on( 'value', (snapshot) => {
                 var cubeNumber = snapshot.val();
+                if(cubeNumber == -1){
+                    //ignore this because it is the just the initial setup being written
+                    return;
+                }
                 //TODO: find the cube whos number is cubeNumber
                 console.log("the other player has ended their turn");
                 endTurn();
             });
             playersRef.on( 'value', (snapshot) => {
                 //update gamestate, and startPlaying()
-                gameState.oponantUserName = snapshot.value.you;
-                database.ref('rooms/' + roomNumber + '/appState').once( 'value' ).then((snapshot) =>{
-                    var playerOne = snapshot.val().playerOne
+                gameState.oponantUserName = snapshot.val().you;
+                if(gameState.oponantUserName == ""){
+                    //ignore this because it is the just the initial setup being written
+                    return;
+                }
+                console.log(gameState.oponantUserName);
+                var playerOneRef = database.ref('rooms/' + roomNumber + '/appState/playerOne');
+                playerOneRef.on( 'value', (snapshot) =>{
+                    var playerOne = snapshot.val();
+                    if(playerOne == -1){
+                        //ignore this, if playerOne is -1 then I don't care about it
+                        return;
+                    }
                     if(playerOne == 0) gameState.showEndTurn = true;
+                    console.log(playerOne);
+                    playerOneRef.off();
                     startPlaying();
                 });
             });
@@ -45,11 +65,11 @@ function createRoom( public ){
 }
 
 function createPublicRoom(){
-    createRoom( false );
+    createRoom( true );
 }
 
 function createPrivateRoom(){
-    createRoom( true );
+    createRoom( false );
 }
 
 

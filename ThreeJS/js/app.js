@@ -48,6 +48,7 @@ function localMultiplayerSetup(){
         showEndTurn: true,
     };
     UISetup( LOCALMULTIPLAYER );
+    startPlaying();
 }
 
 function onlineMultiplayerSetup( roomNumber, oponant ){
