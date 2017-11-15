@@ -27,25 +27,25 @@
 					<div id="mainTitle">HOTDOG</div>
 					<div id="subTitle">a 3D Connect-4 style game</div>
 				</div>
-				<div class="col-md-0 absolute centerDiv above start_hidden horizontalCenter" style="top: 5%;">
-					<div id="turnDisplay"></div>
+				<div class="col-md-0 absolute centerDiv above horizontalCenter" id="start_hidden" style="top: 5%;">
+					<div id="turn-display"></div>
 					<button class="gameUI" id="endTurn">End Turn</button>
 				</div>
 			</div>
-			<div class="row overlay absolute above temporary">
+			<div class="row overlay absolute above temporary" id="main-overlay">
 				<div class="col-md-4 verticalCenter">
 					<div class="row">
 						<div class="col-md-6 col-md-offset-3 horizontalCenter">
 							<button class="link" id="singlePlayer">Single Player</button>
 						</div>
 					</div>
-					</br>
+					<br>
 					<div class="row">
 						<div class="col-md-6 col-md-offset-3 horizontalCenter">
 							<button class="link" id="localMultiplayer">Local Multiplayer</button>
 						</div>
 					</div>
-					</br>
+					<br>
 					<div class="row">
 						<div class="col-md-6 col-md-offset-3 horizontalCenter">
 							<button class="link" id="onlineMultiplayer">Online Multiplayer</button>
@@ -61,6 +61,76 @@
 					<div class="row">
 						<div class="col-md-6 col-md-offset-3 blackBorder">
 							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis fermentum vehicula nisl, ut iaculis dolor facilisis ac. Nullam diam nunc, scelerisque eu tellus in, congue vestibulum tellus. Nunc at euismod dui, sit amet tempor tortor. Aenean congue eu ante nec convallis. Aliquam et nibh tempor, sollicitudin odio nec, finibus mi. Proin vel finibus dui, vitae convallis urna. Morbi varius nisi vel tellus ullamcorper euismod.
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row overlay absolute above" id="online-overlay">
+				<div class="col-md-4">
+					<div class="row">
+						<div class="col-md-6 col-md-offset-3 horizontalCenter">
+							<input type="text" id="username-input" placeholder="username"></input>
+						</div>
+					</div>
+					<br>
+					<div class="row">
+						<div class="col-md-6 col-md-offset-3 horizontalCenter">
+							<button class="link" id="createRoom">Create Room</button>
+						</div>
+					</div>
+					<br>
+					<div class="row">
+						<div class="col-md-6 col-md-offset-3 horizontalCenter">
+							<button class="link" id="joinRoom">Join Room</button>
+						</div>
+					</div>
+					<br>	
+					<div class="row">
+						<div class="col-md-6 col-md-offset-3 horizontalCenter">
+							<button class="link" id="backOnline">Back</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row overlay absolute above" id="create-room-overlay">
+				<div class="col-md-4">
+					<div class="row">
+						<div class="col-md-6 col-md-offset-3 horizontalCenter">
+							<button class="link" id="privateRoom">Private Room</button>
+						</div>
+					</div>
+					<br>
+					<div class="row">
+						<div class="col-md-6 col-md-offset-3 horizontalCenter">
+							<button class="link" id="publicRoom">Public Room</button>
+						</div>
+					</div>
+					<br>
+					<div class="row">
+						<div class="col-md-6 col-md-offset-3 horizontalCenter">
+							<button class="link" id="backCreate">Back</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row overlay absolute above" id="join-room-overlay">
+				<div class="col-md-4">
+					<div class="row">
+						<div class="col-md-6 col-md-offset-3 horizontalCenter">
+							<button class="link" id="randomRoom">Random Room</button>
+						</div>
+					</div>
+					<br>
+					<div class="row">
+						<div class="col-md-6 col-md-offset-3 horizontalCenter">
+							<button class="link" id="selectRoom">Join</button>
+							<input type="text" id="room-number-input"></input>
+						</div>
+					</div>
+					<br>
+					<div class="row">
+						<div class="col-md-6 col-md-offset-3 horizontalCenter">
+							<button class="link" id="backJoin">Back</button>
 						</div>
 					</div>
 				</div>

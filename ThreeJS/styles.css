@@ -99,11 +99,31 @@ button.gameUI {
     display: inline-block;
 }
 
-.start_hidden {
+#start_hidden {
+    display: none;
+}
+
+#online-overlay {
+    display: none;
+}
+
+#create-room-overlay {
+    display: none;
+}
+
+#join-room-overlay {
     display: none;
 }
 
 
-#turnDisplay{
+#turn-display{
     font-size: 32px;
+}
+
+#room-number-input{
+    border: 1px solid #999;
+}
+
+#username-input {
+    border: 1px solid #999;
 }

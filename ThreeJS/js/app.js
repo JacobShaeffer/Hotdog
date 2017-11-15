@@ -9,21 +9,27 @@ const SINGLEPLAYER = 0, LOCALMULTIPLAYER = 1, ONLINEMULTIPLAYER = 2;
 var gameState = {};
 var cubeIsSelected = [];
 var autoRotateSpeed = 0.3;
+var backFrom;
+var endingTurn;
 
 function initialSetup(){
     isPlaying = false;
-
     
-    firebase.database().ref('users/Your mother steve!').set({
-        username: "your",
-        email: "mother",
-        age: "steve",
-    })
+    setFirebaseDB();
 
     document.getElementById( "singlePlayer" ).addEventListener( "click", singlePlayerSetup, false );
     document.getElementById( "localMultiplayer" ).addEventListener( "click", localMultiplayerSetup, false );
-    document.getElementById( "onlineMultiplayer" ).addEventListener( "click", onlineMultiplayerSetup, false );
+    document.getElementById( "onlineMultiplayer" ).addEventListener( "click", multiplayerSelected, false );
     document.getElementById( "endTurn" ).addEventListener( "click", endTurn, false );
+    document.getElementById( "createRoom" ).addEventListener( "click", createSelected, false );
+    document.getElementById( "joinRoom" ).addEventListener( "click", joinSelected, false );
+    document.getElementById( "backOnline" ).addEventListener( "click", back, false );
+    document.getElementById( "privateRoom" ).addEventListener( "click", createPrivateRoom, false );
+    document.getElementById( "publicRoom" ).addEventListener( "click", createPublicRoom, false );
+    document.getElementById( "backCreate" ).addEventListener( "click", back, false );
+    document.getElementById( "randomRoom" ).addEventListener( "click", joinRandomRoom, false );
+    document.getElementById( "selectRoom" ).addEventListener( "click", joinSelectedRoom, false );
+    document.getElementById( "backJoin" ).addEventListener( "click", back, false );
     document.addEventListener( 'click', mouseInteractionHandler, false);
 }
 
@@ -39,24 +45,77 @@ function localMultiplayerSetup(){
             0xff0000,//player1 color
             0xffff00,//player2 color
         ],
-
+        showEndTurn: true,
     };
     UISetup( LOCALMULTIPLAYER );
-    startPlaying();
 }
 
-function onlineMultiplayerSetup(){
-    return;
-
-
+function onlineMultiplayerSetup( roomNumber, oponant ){
     gameState = {
-        currentPlayer: 0,//this needs to be set according to who is decided to go first
-        playerColors:[],//assign colors based on first or second player
-        
+        currentPlayer: 0,//current player is always 0, show end turn will decide if this player is player 0 or not
+        playerColors:[
+            0xff0000,//player1 color
+            0xffff00,//player2 color
+        ],
+        roomNumber: roomNumber,
+        oponantUserName: oponant,
+        showEndTurn: false,
     };
     UISetup( ONLINEMULTIPLAYER );
 }
 
+function multiplayerSelected(){
+    backFrom = "multiplayer";
+    document.getElementById( "main-overlay" ).style.display = "none";
+    document.getElementById( "online-overlay" ).style.display = "inline-block";
+}
+
+function createSelected(){
+    if(checkForUserName() == false) return;
+    backFrom = "create";
+    document.getElementById( "online-overlay" ).style.display = "none";
+    document.getElementById( "create-room-overlay" ).style.display = "inline-block";
+}
+
+function joinSelected(){
+    if(checkForUserName() == false) return;
+    backFrom = "join";
+    document.getElementById( "online-overlay" ).style.display = "none";
+    document.getElementById( "join-room-overlay" ).style.display = "inline-block";
+}
+
+function checkForUserName(){
+    var input = document.getElementById( "username-input" );
+    var username = input.value;
+    if(username == ""){
+        input.placeholder = "Enter Username";
+        input.style.border = "1px solid #f00";
+        return false;
+    }
+    else {
+        gameState.userName = username;
+        return true;
+    }
+}
+
+function back(){
+    switch(backFrom){
+        case "multiplayer":
+            document.getElementById( "online-overlay" ).style.display = "none";
+            document.getElementById( "main-overlay" ).style.display = "inline-block";
+            break;
+        case "create":
+            document.getElementById( "create-room-overlay" ).style.display = "none";
+            document.getElementById( "online-overlay" ).style.display = "inline-block";
+            backFrom = "multiplayer";
+            break;
+        case "join":
+            document.getElementById( "join-room-overlay" ).style.display = "none";
+            document.getElementById( "online-overlay" ).style.display = "inline-block";
+            backFrom = "multiplayer";
+            break;
+    }
+}
 
 
 function convertColor( color ){
@@ -65,6 +124,7 @@ function convertColor( color ){
 }
 
 function startPlaying(){
+    console.log("game has begun: " + JSON.stringify(gameState));
     resetGameBoard();
     isPlaying = true;
     controls.enabled = true;
@@ -75,22 +135,31 @@ function UISetup( playmodePARAM ){
     for(var element of document.querySelectorAll(".temporary")){
         element.style.display = "none";
     }
-    for(var element of document.querySelectorAll(".start_hidden")){
-        element.style.display = "inline-block";
-    }
+    toggleEndTurnButton(gameState.showEndTurn);
     switch(playmode){
         case SINGLEPLAYER:
             break;
         case LOCALMULTIPLAYER:
-            document.getElementById( "turnDisplay" ).innerHTML = "Player One's Turn";
-            document.getElementById( "turnDisplay" ).style.color = convertColor( gameState.playerColors[gameState.currentPlayer] );
+            document.getElementById( "turn-display" ).innerHTML = "Player One's Turn";
+            document.getElementById( "turn-display" ).style.color = convertColor( gameState.playerColors[gameState.currentPlayer] );
             break;
         case ONLINEMULTIPLAYER:
             break;
     }
 }
 
+function toggleEndTurnButton( show ){
+    if(show){
+        document.getElementById( "start-hidden" ).style.display = "inline-block";
+    }
+    else{
+        document.getElementById( "start-hidden" ).style.display = "none";
+    }
+}
+
 function endTurn(){
+    if(endingTurn) return;
+    endingTurn = true;
     //FIXME: don't allow a player to end their turn without selecting a cube    
     selected.material.transparent = false;
     selected.isSelectable = false;
@@ -107,13 +176,17 @@ function endTurn(){
             case SINGLEPLAYER:
                 break;
             case LOCALMULTIPLAYER:
-                document.getElementById( "turnDisplay" ).innerHTML = gameState.currentPlayer == 0 ? "Player One's Turn" : "Player Two's Turn";
-                document.getElementById( "turnDisplay" ).style.color = convertColor( gameState.playerColors[gameState.currentPlayer] );
+                document.getElementById( "turn-display" ).innerHTML = gameState.currentPlayer == 0 ? "Player One's Turn" : "Player Two's Turn";
+                document.getElementById( "turn-display" ).style.color = convertColor( gameState.playerColors[gameState.currentPlayer] );
                 break;
             case ONLINEMULTIPLAYER:
+                //Toggle player control
+                //toggle value of turn display
+                gameState.showEndTurn = !gameState.showEndTurn;
                 break;
         }
     }
+    endingTurn = false;
 }
 
 function gameOver( ){
