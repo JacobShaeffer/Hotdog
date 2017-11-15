@@ -45,13 +45,19 @@ function localMultiplayerSetup(){
             0xff0000,//player1 color
             0xffff00,//player2 color
         ],
-        showEndTurn: true,
     };
-    UISetup( LOCALMULTIPLAYER );
+    playmode = LOCALMULTIPLAYER;
+    for(var element of document.querySelectorAll(".temporary")){
+        element.style.display = "none";
+    }
+    toggleEndTurnButton(true);
+    document.getElementById( "turn-display" ).innerHTML = "Player One's Turn";
+    document.getElementById( "turn-display" ).style.color = convertColor( gameState.playerColors[gameState.currentPlayer] );
+            
     startPlaying();
 }
 
-function onlineMultiplayerSetup( roomNumber, oponant ){
+function onlineMultiplayerCreateSetup( roomNumber ){
     gameState = {
         currentPlayer: 0,//current player is always 0, show end turn will decide if this player is player 0 or not
         playerColors:[
@@ -59,10 +65,39 @@ function onlineMultiplayerSetup( roomNumber, oponant ){
             0xffff00,//player2 color
         ],
         roomNumber: roomNumber,
-        oponantUserName: oponant,
         showEndTurn: false,
+        userName: gameState.userName,
     };
-    UISetup( ONLINEMULTIPLAYER );
+
+    playmode = ONLINEMULTIPLAYER;
+    for(var element of document.querySelectorAll(".temporary")){
+        element.style.display = "none";
+    }
+    document.getElementById( "create-room-overlay" ).style.display = "none";
+    toggleEndTurnButton( false );
+    //TODO: add appropriate ui elements
+}
+
+function onlineMultiplayerJoinSetup( roomNumber, showEndTurn, oponantName ){
+    gameState = {
+        currentPlayer: 0,//current player is always 0, show end turn will decide if this player is player 0 or not
+        playerColors:[
+            0xff0000,//player1 color
+            0xffff00,//player2 color
+        ],
+        roomNumber: roomNumber,
+        oponantUserName: oponantName,
+        showEndTurn: showEndTurn,
+        userName: gameState.userName,
+    };
+
+    playmode = ONLINEMULTIPLAYER;
+    for(var element of document.querySelectorAll(".temporary")){
+        element.style.display = "none";
+    }
+    document.getElementById( "join-room-overlay" ).style.display = "none";
+    toggleEndTurnButton( showEndTurn );
+    //TODO: add appropriate ui elements
 }
 
 function multiplayerSelected(){

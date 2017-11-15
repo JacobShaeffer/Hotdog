@@ -1,4 +1,4 @@
-//TODO: figure out how to handle a player leaving a room in progress
+//TODO: window.onbeforeunload
 var database;
 
 function createRoom( public ){
@@ -7,6 +7,7 @@ function createRoom( public ){
     getUsedRooms(( inuse ) => {
         console.log("retrieved active room list");
         findUsableRoom( inuse, ( roomNumber ) => {
+            console.log("created room " + roomNumber);
             database.ref( 'rooms/' + roomNumber ).set({
                 public: public,
                 appState: {
@@ -27,16 +28,7 @@ function createRoom( public ){
             var lastSelectedRef = database.ref( 'rooms/' + roomNumber +'/appState/lastSelected' );
             var playersRef = database.ref( 'rooms/' + roomNumber + '/players' );
         
-            lastSelectedRef.on( 'value', (snapshot) => {
-                var cubeNumber = snapshot.val();
-                if(cubeNumber == -1){
-                    //ignore this because it is the just the initial setup being written
-                    return;
-                }
-                //TODO: find the cube whos number is cubeNumber
-                console.log("the other player has ended their turn");
-                endTurn();
-            });
+            lastSelectedRef.on( 'value', handleCubeSelectionChanges);
             playersRef.on( 'value', (snapshot) => {
                 //update gamestate, and startPlaying()
                 gameState.oponantUserName = snapshot.val().you;
@@ -55,11 +47,12 @@ function createRoom( public ){
                     if(playerOne == 0) gameState.showEndTurn = true;
                     console.log(playerOne);
                     playerOneRef.off();
+                    //TODO: update the ui to show turn and player name
                     startPlaying();
                 });
             });
         
-            onlineMultiplayerSetup( roomNumber, "" );
+            onlineMultiplayerCreateSetup( roomNumber );
         });
     });
 }
@@ -77,11 +70,23 @@ function createPrivateRoom(){
 function joinRoom( roomNumber ){
     currentPlayer = Math.floor(Math.random() * 2);
 
-    onlineMultiplayerSetup( currentPlayer, roomNumber );
+    var lastSelectedRef = database.ref( 'rooms/' + roomNumber +'/appState/lastSelected' );
+    var playersRef = database.ref( 'rooms/' + roomNumber + '/players' );
+    var playerOneRef = database.ref('rooms/' + roomNumber + '/appState/playerOne');
+
+    playerOneRef.set(currentPlayer);
+    database.ref( 'rooms/' + roomNumber + '/players/you' ).set(gameState.userName);
+
+    lastSelectedRef.on( 'value', handleCubeSelectionChanges);
+    playersRef.once( 'value' ).then( (snapshot) => {
+        onlineMultiplayerJoinSetup( roomNumber, snapshot.val().me );
+        
+        startPlaying();
+    });
 }
 
 function joinSelectedRoom(){
-
+    joinRoom( document.getElementById("room-number-input").value );
 }
 
 /**
@@ -140,8 +145,20 @@ function setLastSelected( roomNumber, number ){
 function findUsableRoom( inuse, callback ){
     var roomNumber = Math.floor(Math.random()*10000);
     console.log("inuse: "+inuse[0]);
-    while(inuse.indexOf(roomNumber) > -1){//FIXME: indexOf os apparently not a function
+    while(inuse.indexOf(roomNumber) > -1){
         roomNumber = Math.floor(Math.random()*10000);
     }
     callback( roomNumber );
+}
+
+function handleCubeSelectionChanges( snapshot ){
+    var cubeNumber = snapshot.val();
+    if(cubeNumber == -1){
+        //ignore this because it is the just the initial setup being written
+        return;
+    }
+    //TODO: check if the number given is a new cube or the same cube as last time
+    //TODO: find the cube whos number is cubeNumber
+    console.log("the other player has ended their turn");
+    endTurn();
 }
