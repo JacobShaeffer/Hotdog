@@ -75,6 +75,7 @@ function onlineMultiplayerCreateSetup( roomNumber ){
     }
     document.getElementById( "create-room-overlay" ).style.display = "none";
     toggleEndTurnButton( false );
+    document.getElementById( "start-hidden" ).style.display = "inline-block";
     //TODO: add appropriate ui elements
 }
 
@@ -97,6 +98,7 @@ function onlineMultiplayerJoinSetup( roomNumber, showEndTurn, oponantName ){
     }
     document.getElementById( "join-room-overlay" ).style.display = "none";
     toggleEndTurnButton( showEndTurn );
+    document.getElementById( "start-hidden" ).style.display = "inline-block";
     //TODO: add appropriate ui elements
 }
 
@@ -129,7 +131,7 @@ function checkForUserName(){
         return false;
     }
     else {
-        gameState.userName = username;
+        gameState.userName = username.substring(0,12);
         return true;
     }
 }
@@ -168,10 +170,10 @@ function startPlaying(){
 
 function toggleEndTurnButton( show ){
     if(show){
-        document.getElementById( "start-hidden" ).style.display = "inline-block";
+        document.getElementById( "endTurn" ).style.display = "inline-block";
     }
     else{
-        document.getElementById( "start-hidden" ).style.display = "none";
+        document.getElementById( "endTurn" ).style.display = "none";
     }
 }
 

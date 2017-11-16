@@ -22,7 +22,6 @@ function createRoom( public ){
             });
 
             //TODO: update ui
-            //-remove the left over buttons
             //-place the room number on screen
             //-put "Playername VS ..." and make the elipse cycle
         
@@ -161,8 +160,6 @@ function handleCubeSelectionChanges( snapshot ){
         //ignore this because it is the just the initial setup being written
         return;
     }
-    //TODO: check if the number given is a new cube or the same cube as last time
-    //TODO: find the cube whos number is cubeNumber
     if(cubeNumber == lastCube){
         //Nothing has acutally changed, don't do anything
         return;
