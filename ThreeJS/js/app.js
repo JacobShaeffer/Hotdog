@@ -186,6 +186,7 @@ function endTurn(){
     selected = null;
     
     if(detectWinConditions( num, gameState.currentPlayer )){
+        if(playmode == ONLINEMULTIPLAYER) setLastSelected( gameState.roomNumber, num );
         gameOver();
     }
     else{
