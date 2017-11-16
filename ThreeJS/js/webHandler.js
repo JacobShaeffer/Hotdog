@@ -1,5 +1,6 @@
 //TODO: window.onbeforeunload
 var database;
+var lastCube;
 
 function createRoom( public ){
     //create listener on players and appState
@@ -29,6 +30,7 @@ function createRoom( public ){
             var playersRef = database.ref( 'rooms/' + roomNumber + '/players' );
         
             lastSelectedRef.on( 'value', handleCubeSelectionChanges);
+            lastCube = -1;
             playersRef.on( 'value', (snapshot) => {
                 //update gamestate, and startPlaying()
                 gameState.oponantUserName = snapshot.val().you;
@@ -46,7 +48,8 @@ function createRoom( public ){
                     }
                     if(playerOne == 0) gameState.showEndTurn = true;
                     console.log(playerOne);
-                    playerOneRef.off();
+                    playerOneRef.off(); 
+                    toggleEndTurnButton( gameState.showEndTurn );
                     //TODO: update the ui to show turn and player name
                     startPlaying();
                 });
@@ -79,8 +82,8 @@ function joinRoom( roomNumber ){
 
     lastSelectedRef.on( 'value', handleCubeSelectionChanges);
     playersRef.once( 'value' ).then( (snapshot) => {
-        onlineMultiplayerJoinSetup( roomNumber, snapshot.val().me );
-        
+        onlineMultiplayerJoinSetup( roomNumber, currentPlayer == 1, snapshot.val().me );
+
         startPlaying();
     });
 }
@@ -135,6 +138,7 @@ function setFirebaseDB(){
 }
 
 function setLastSelected( roomNumber, number ){
+    lastCube = number;
     database.ref( 'rooms/' + roomNumber +'/appState/lastSelected' ).set( number );
 }
 
@@ -159,6 +163,18 @@ function handleCubeSelectionChanges( snapshot ){
     }
     //TODO: check if the number given is a new cube or the same cube as last time
     //TODO: find the cube whos number is cubeNumber
+    if(cubeNumber == lastCube){
+        //Nothing has acutally changed, don't do anything
+        return;
+    }
+    for(var i=0; i<scene.children.length; i++){
+        if(scene.children[i].number == cubeNumber){
+            selected = scene.children[i];
+            selected.material.color.set( gameState.playerColors[gameState.currentPlayer] );
+            break;
+        }
+    }
+    lastCube = cubeNumber;
     console.log("the other player has ended their turn");
     endTurn();
 }

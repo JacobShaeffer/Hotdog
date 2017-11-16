@@ -166,24 +166,6 @@ function startPlaying(){
     controls.enabled = true;
 }
 
-function UISetup( playmodePARAM ){
-    playmode = playmodePARAM;
-    for(var element of document.querySelectorAll(".temporary")){
-        element.style.display = "none";
-    }
-    toggleEndTurnButton(gameState.showEndTurn);
-    switch(playmode){
-        case SINGLEPLAYER:
-            break;
-        case LOCALMULTIPLAYER:
-            document.getElementById( "turn-display" ).innerHTML = "Player One's Turn";
-            document.getElementById( "turn-display" ).style.color = convertColor( gameState.playerColors[gameState.currentPlayer] );
-            break;
-        case ONLINEMULTIPLAYER:
-            break;
-    }
-}
-
 function toggleEndTurnButton( show ){
     if(show){
         document.getElementById( "start-hidden" ).style.display = "inline-block";
@@ -216,9 +198,11 @@ function endTurn(){
                 document.getElementById( "turn-display" ).style.color = convertColor( gameState.playerColors[gameState.currentPlayer] );
                 break;
             case ONLINEMULTIPLAYER:
+                setLastSelected( gameState.roomNumber, num );
                 //Toggle player control
                 //toggle value of turn display
                 gameState.showEndTurn = !gameState.showEndTurn;
+                toggleEndTurnButton( gameState.showEndTurn );
                 break;
         }
     }
@@ -307,6 +291,9 @@ function mouseInteractionHandler( event ) {
     if(isPlaying == false){
         return;
     }
+    if(gameState.showEndTurn == false){
+        return;
+    }
 
     //FIXME: make me not suck
 
@@ -331,7 +318,6 @@ function mouseInteractionHandler( event ) {
         }
         selected = intersects[0].object;
         selected.material.color.set( gameState.playerColors[gameState.currentPlayer] );
-        //console.log(JSON.stringify(selected.material));
     }
 
 }
