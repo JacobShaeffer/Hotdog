@@ -131,7 +131,7 @@ function checkForUserName(){
         return false;
     }
     else {
-        gameState.userName = username.substring(0,12);
+        gameState.userName = username.substring(0,20);
         return true;
     }
 }

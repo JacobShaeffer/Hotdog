@@ -49,12 +49,15 @@ function createRoom( public ){
                     console.log(playerOne);
                     playerOneRef.off(); 
                     toggleEndTurnButton( gameState.showEndTurn );
+                    setUpOnlineTitle( gameState.userName, gameState.oponantUserName, 0 );
                     //TODO: update the ui to show turn and player name
                     startPlaying();
                 });
             });
         
             onlineMultiplayerCreateSetup( roomNumber );
+            document.getElementById( "room-display" ).innerHTML = "Room: " + padZeros( roomNumber );
+            document.getElementById( "turn-display" ).innerHTML = gameState.userName + " VS ...";
         });
     });
 }
@@ -82,7 +85,9 @@ function joinRoom( roomNumber ){
     lastSelectedRef.on( 'value', handleCubeSelectionChanges);
     playersRef.once( 'value' ).then( (snapshot) => {
         onlineMultiplayerJoinSetup( roomNumber, currentPlayer == 1, snapshot.val().me );
-
+        document.getElementById( "room-display" ).innerHTML = "Room: " + padZeros( roomNumber );
+        setUpOnlineTitle( gameState.oponantUserName, gameState.userName, 1 );
+        
         startPlaying();
     });
 }
@@ -174,4 +179,33 @@ function handleCubeSelectionChanges( snapshot ){
     lastCube = cubeNumber;
     console.log("the other player has ended their turn");
     endTurn();
+}
+
+function padZeros( number ){
+    var str = number + "";
+    while(str.length < 4){
+        str = "0" + str;
+    }
+    return str;
+}
+
+function setUpOnlineTitle( firstName, secondName, who ){
+    var name1 = document.getElementById( "name1-display" );
+    var name2 = document.getElementById( "name2-display" );
+    var turn = document.getElementById( "turn-display" );
+
+    name1.innerHTML = firstName;
+    name2.innerHTML = secondName;
+    turn.innerHTML = "VS";
+
+    switch(who){
+        case 0:
+            name1.style.color = gameState.showEndTurn ? "red" : "yellow";
+            name2.style.color = gameState.showEndTurn ? "yellow" : "red";
+            break;
+        case 1:
+            name1.style.color = gameState.showEndTurn ? "yellow" : "red";
+            name2.style.color = gameState.showEndTurn ? "red" : "yellow";
+            break;
+    }
 }

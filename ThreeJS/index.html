@@ -22,17 +22,24 @@
 	</head>
 	<body>
 		<div class="container-fluid">
+			<div class="row absolute above" style="width: 20%; bottom: 2%;">
+				<div class="col-md-10">
+					<div>This project is a VERY EARLY Alpha. So please, be kind to it.</div>
+				</div>
+			</div>
 			<div class="row">
 				<div class="col-md-0 absolute centerDiv above temporary">
 					<div id="mainTitle">HOTDOG</div>
 					<div id="subTitle">a 3D Connect-4 style game</div>
 				</div>
 				<div class="col-md-0 absolute centerDiv above horizontalCenter" id="start-hidden" style="top: 5%;">
+					<div id="name1-display"></div>
 					<div id="turn-display"></div>
+					<div id="name2-display"></div>
 					<button class="gameUI" id="endTurn">End Turn</button>
 				</div>
-				<div class="col-md-0 above">
-					<!-- room number -->
+				<div class="col-md-0 absolute above top-left">
+					<div id="room-display"></div>
 				</div>
 			</div>
 			<div class="row overlay absolute above temporary" id="main-overlay">

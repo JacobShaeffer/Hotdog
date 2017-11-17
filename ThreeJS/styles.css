@@ -90,6 +90,10 @@ button.gameUI {
     z-index: 1000;
 }
 
+.top-left {
+    top: 1%;
+    left: 1%;
+}
 
 .permenant {
     display: inline-block;
@@ -120,10 +124,26 @@ button.gameUI {
     font-size: 32px;
 }
 
+#name1-display{
+    font-size: 32px;
+}
+
+#name2-display{
+    font-size: 32px;
+}
+
+#room-display{
+    font-size: 18px;
+}
+
 #room-number-input{
+    width: 36px;
     border: 1px solid #999;
+    padding-left: 1px;
+    text-align: center;
 }
 
 #username-input {
+    width: 150px;
     border: 1px solid #999;
 }
