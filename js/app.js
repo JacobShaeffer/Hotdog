@@ -35,7 +35,7 @@ function initialSetup(){
 
 function singlePlayerSetup(){
     return;
-    UISetup( SINGLEPLAYER );
+    
 }
 
 function localMultiplayerSetup(){
@@ -51,8 +51,10 @@ function localMultiplayerSetup(){
         element.style.display = "none";
     }
     toggleEndTurnButton(true);
-    document.getElementById( "turn-display" ).innerHTML = "Player One's Turn";
-    document.getElementById( "turn-display" ).style.color = convertColor( gameState.playerColors[gameState.currentPlayer] );
+    var turnDisplay = document.getElementById( "turn-display" );
+    turnDisplay.innerHTML = "Player One's Turn";
+    turnDisplay.style.color = convertColor( gameState.playerColors[gameState.currentPlayer] );
+    document.getElementById( "start-hidden" ).style.display = "inline-block";    
             
     startPlaying();
 }
@@ -179,8 +181,9 @@ function toggleEndTurnButton( show ){
 
 function endTurn(){
     if(endingTurn) return;
+    if(selected == undefined) return;   
     endingTurn = true;
-    //FIXME: don't allow a player to end their turn without selecting a cube    
+    //FIXME: don't allow a player to end their turn without selecting a cube 
     selected.material.transparent = false;
     selected.isSelectable = false;
     var num = selected.number;
