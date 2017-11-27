@@ -1,3 +1,4 @@
+"use strict"
 //
 // Rendering functions and variables, and Camera Interaction Controls
 //

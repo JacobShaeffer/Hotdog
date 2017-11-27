@@ -183,7 +183,6 @@ function endTurn(){
     if(endingTurn) return;
     if(selected == undefined) return;   
     endingTurn = true;
-    //FIXME: don't allow a player to end their turn without selecting a cube 
     selected.material.transparent = false;
     selected.isSelectable = false;
     var num = selected.number;
@@ -198,6 +197,11 @@ function endTurn(){
         gameState.currentPlayer = gameState.currentPlayer == 0 ? 1 : 0;
         switch(playmode){
             case SINGLEPLAYER:
+                gameState.showEndTurn = !gameState.showEndTurn;
+                toggleEndTurnButton( gameState.showEndTurn );
+                aiTurn();
+                gameState.showEndTurn = !gameState.showEndTurn;
+                toggleEndTurnButton( gameState.showEndTurn );
                 break;
             case LOCALMULTIPLAYER:
                 document.getElementById( "turn-display" ).innerHTML = gameState.currentPlayer == 0 ? "Player One's Turn" : "Player Two's Turn";
