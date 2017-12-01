@@ -71,6 +71,18 @@ function resetGameBoard(){
             }
         }
     }
+    if(playmode == SINGLEPLAYER){
+        isCubeSelectable = new Array(5);
+        for(var i=0; i<5; i++){
+            isCubeSelectable[i] = new Array(5);
+            for(var j=0; j<5; j++){
+                isCubeSelectable[i][j] = new Array(5);
+                for(var k=0; k<5; k++){
+                    isCubeSelectable[i][j][k] = (j == 0);
+                }
+            }
+        }
+    }
     while(scene.children.length > 0){
         scene.remove(scene.children[0]);
     }
@@ -91,6 +103,15 @@ function addCube( number, scene ){
     mesh.matrixAutoUpdate = false;
 
     scene.add( mesh );
+
+    if(playmode == SINGLEPLAYER){
+        var x = number % 5.0;
+        var y = Math.floor(number / 25.0);
+        var z = Math.floor((number % 25) / 5.0);
+        isCubeSelectable[x][y][z] = false;
+        if(y+1 < 5)
+            isCubeSelectable[x][y+1][z] = true;
+    }
 }
 
 /**

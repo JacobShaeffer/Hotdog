@@ -8,6 +8,7 @@ var playmode;
 const SINGLEPLAYER = 0, LOCALMULTIPLAYER = 1, ONLINEMULTIPLAYER = 2;
 var gameState = {};
 var cubeIsSelected = [];
+var isCubeSelectable;
 var autoRotateSpeed = 0.3;
 var backFrom;
 var endingTurn;
@@ -34,8 +35,31 @@ function initialSetup(){
 }
 
 function singlePlayerSetup(){
-    return;
+    var isHumanPlayerFirst = Math.floor(Math.random() * 2) == 0;//determine if the player is player 0 or 1
+    gameState = {
+        currentPlayer: 0,
+        ai: isHumanPlayerFirst ? 1 : 0,
+        playerColors:[
+            0xff0000,//player1 color
+            0xffff00,//player2 color
+        ],
+    };
+    playmode = SINGLEPLAYER;
+    for(var element of document.querySelectorAll(".temporary")){
+        element.style.display = "none";
+    }
+    //TODO: determine who goes first
+    //
     
+    toggleEndTurnButton( isHumanPlayerFirst );
+    var turnDisplay = document.getElementById( "turn-display" );
+    turnDisplay.innerHTML = isHumanPlayerFirst ? "Your Turn" : "Computer's Turn";
+    turnDisplay.style.color = convertColor( gameState.playerColors[gameState.currentPlayer] );
+    document.getElementById( "start-hidden" ).style.display = "inline-block";   
+    if(isHumanPlayerFirst){
+        initializeAi( 2 );
+        aiTurn();
+    }
 }
 
 function localMultiplayerSetup(){
@@ -199,9 +223,10 @@ function endTurn(){
             case SINGLEPLAYER:
                 gameState.showEndTurn = !gameState.showEndTurn;
                 toggleEndTurnButton( gameState.showEndTurn );
-                aiTurn();
-                gameState.showEndTurn = !gameState.showEndTurn;
-                toggleEndTurnButton( gameState.showEndTurn );
+                if(gameState.currentPlayer == gameState.ai){
+                    endingTurn == false;
+                    aiTurn();
+                }
                 break;
             case LOCALMULTIPLAYER:
                 document.getElementById( "turn-display" ).innerHTML = gameState.currentPlayer == 0 ? "Player One's Turn" : "Player Two's Turn";
