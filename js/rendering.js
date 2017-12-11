@@ -72,15 +72,9 @@ function resetGameBoard(){
         }
     }
     if(playmode == SINGLEPLAYER){
-        isCubeSelectable = new Array(5);
-        for(var i=0; i<5; i++){
-            isCubeSelectable[i] = new Array(5);
-            for(var j=0; j<5; j++){
-                isCubeSelectable[i][j] = new Array(5);
-                for(var k=0; k<5; k++){
-                    isCubeSelectable[i][j][k] = (j == 0);
-                }
-            }
+        isCubeSelectable = [];
+        for(var i=0; i<25; i++){
+            isCubeSelectable.push(0);
         }
     }
     while(scene.children.length > 0){
@@ -91,7 +85,12 @@ function resetGameBoard(){
 }
 
 function addCube( number, scene ){
-    if(number >= 125) return;
+    if(number >= 125) {
+        if(playmode == SINGLEPLAYER){
+            isCubeSelectable[number % 5] = -1;
+        }
+        return;
+    }
     var geometry = new THREE.BoxGeometry( 1, 1, 1 );
     var material = new THREE.MeshLambertMaterial( {color: 0x333333, transparent: true, opacity: 0.5} );
 
@@ -105,12 +104,7 @@ function addCube( number, scene ){
     scene.add( mesh );
 
     if(playmode == SINGLEPLAYER){
-        var x = number % 5.0;
-        var y = Math.floor(number / 25.0);
-        var z = Math.floor((number % 25) / 5.0);
-        isCubeSelectable[x][y][z] = false;
-        if(y+1 < 5)
-            isCubeSelectable[x][y+1][z] = true;
+        isCubeSelectable[number % 5]++;
     }
 }
 

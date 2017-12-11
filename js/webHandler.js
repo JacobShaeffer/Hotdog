@@ -1,4 +1,3 @@
-"use strict"
 //TODO: window.onbeforeunload
 var database;
 var lastCube;

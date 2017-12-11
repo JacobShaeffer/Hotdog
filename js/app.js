@@ -8,7 +8,7 @@ var playmode;
 const SINGLEPLAYER = 0, LOCALMULTIPLAYER = 1, ONLINEMULTIPLAYER = 2;
 var gameState = {};
 var cubeIsSelected = [];
-var isCubeSelectable;
+var isCubeSelectable = [];
 var autoRotateSpeed = 0.3;
 var backFrom;
 var endingTurn;
@@ -56,8 +56,10 @@ function singlePlayerSetup(){
     turnDisplay.innerHTML = isHumanPlayerFirst ? "Your Turn" : "Computer's Turn";
     turnDisplay.style.color = convertColor( gameState.playerColors[gameState.currentPlayer] );
     document.getElementById( "start-hidden" ).style.display = "inline-block";   
-    if(isHumanPlayerFirst){
+    startPlaying();
+    if(!isHumanPlayerFirst){
         initializeAi( 2 );
+        console.log("running AI turn");
         aiTurn();
     }
 }
@@ -225,6 +227,7 @@ function endTurn(){
                 toggleEndTurnButton( gameState.showEndTurn );
                 if(gameState.currentPlayer == gameState.ai){
                     endingTurn == false;
+                    console.log("running AI turn");
                     aiTurn();
                 }
                 break;
