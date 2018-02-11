@@ -9,27 +9,20 @@ const SINGLEPLAYER = 0, LOCALMULTIPLAYER = 1, ONLINEMULTIPLAYER = 2;
 var gameState = {};
 var cubeIsSelected = [];
 var autoRotateSpeed = 0.3;
-var backFrom;
 var endingTurn;
+var socket = io();
 
 function initialSetup(){
     isPlaying = false;
-    
-    setFirebaseDB();
 
     document.getElementById( "singlePlayer" ).addEventListener( "click", singlePlayerSetup, false );
-    document.getElementById( "localMultiplayer" ).addEventListener( "click", localMultiplayerSetup, false );
     document.getElementById( "onlineMultiplayer" ).addEventListener( "click", multiplayerSelected, false );
+    document.getElementById( "r1" ).addEventListener( "click", () => { tryJoin(1); }, false );
+    document.getElementById( "r2" ).addEventListener( "click", () => { tryJoin(2); }, false );
+    document.getElementById( "r3" ).addEventListener( "click", () => { tryJoin(3); }, false );
     document.getElementById( "endTurn" ).addEventListener( "click", endTurn, false );
-    document.getElementById( "createRoom" ).addEventListener( "click", createSelected, false );
-    document.getElementById( "joinRoom" ).addEventListener( "click", joinSelected, false );
     document.getElementById( "backOnline" ).addEventListener( "click", back, false );
-    document.getElementById( "privateRoom" ).addEventListener( "click", createPrivateRoom, false );
-    document.getElementById( "publicRoom" ).addEventListener( "click", createPublicRoom, false );
-    document.getElementById( "backCreate" ).addEventListener( "click", back, false );
-    document.getElementById( "randomRoom" ).addEventListener( "click", joinRandomRoom, false );
-    document.getElementById( "selectRoom" ).addEventListener( "click", joinSelectedRoom, false );
-    document.getElementById( "backJoin" ).addEventListener( "click", back, false );
+
     document.addEventListener( 'click', mouseInteractionHandler, false);
 }
 
@@ -38,28 +31,10 @@ function singlePlayerSetup(){
     
 }
 
-function localMultiplayerSetup(){
-    gameState = {
-        currentPlayer: 0,
-        playerColors:[
-            0xff0000,//player1 color
-            0xffff00,//player2 color
-        ],
-    };
-    playmode = LOCALMULTIPLAYER;
-    for(var element of document.querySelectorAll(".temporary")){
-        element.style.display = "none";
-    }
-    toggleEndTurnButton(true);
-    var turnDisplay = document.getElementById( "turn-display" );
-    turnDisplay.innerHTML = "Player One's Turn";
-    turnDisplay.style.color = convertColor( gameState.playerColors[gameState.currentPlayer] );
-    document.getElementById( "start-hidden" ).style.display = "inline-block";    
-            
-    startPlaying();
-}
+function tryJoin( roomNumber ){
+    if(!checkForUserName()) return;
+    joinRoom(roomNumber);
 
-function onlineMultiplayerCreateSetup( roomNumber ){
     gameState = {
         currentPlayer: 0,//current player is always 0, show end turn will decide if this player is player 0 or not
         playerColors:[
@@ -75,57 +50,24 @@ function onlineMultiplayerCreateSetup( roomNumber ){
     for(var element of document.querySelectorAll(".temporary")){
         element.style.display = "none";
     }
-    document.getElementById( "create-room-overlay" ).style.display = "none";
+    document.getElementById( "online-overlay" ).style.display = "none";
     toggleEndTurnButton( false );
     document.getElementById( "start-hidden" ).style.display = "inline-block";
     //TODO: add appropriate ui elements
 }
 
-function onlineMultiplayerJoinSetup( roomNumber, showEndTurn, oponantName ){
-    gameState = {
-        currentPlayer: 0,//current player is always 0, show end turn will decide if this player is player 0 or not
-        playerColors:[
-            0xff0000,//player1 color
-            0xffff00,//player2 color
-        ],
-        roomNumber: roomNumber,
-        oponantUserName: oponantName,
-        showEndTurn: showEndTurn,
-        userName: gameState.userName,
-    };
-
-    playmode = ONLINEMULTIPLAYER;
-    for(var element of document.querySelectorAll(".temporary")){
-        element.style.display = "none";
-    }
-    document.getElementById( "join-room-overlay" ).style.display = "none";
-    toggleEndTurnButton( showEndTurn );
-    document.getElementById( "start-hidden" ).style.display = "inline-block";
-    //TODO: add appropriate ui elements
-}
-
 function multiplayerSelected(){
-    backFrom = "multiplayer";
+    connectToServer((data) => {
+        console.log(JSON.stringify(data));
+        //set it up so the values of data are displayed next to each room button or something
+    });
     document.getElementById( "main-overlay" ).style.display = "none";
     document.getElementById( "online-overlay" ).style.display = "inline-block";
 }
 
-function createSelected(){
-    if(checkForUserName() == false) return;
-    backFrom = "create";
-    document.getElementById( "online-overlay" ).style.display = "none";
-    document.getElementById( "create-room-overlay" ).style.display = "inline-block";
-}
-
-function joinSelected(){
-    if(checkForUserName() == false) return;
-    backFrom = "join";
-    document.getElementById( "online-overlay" ).style.display = "none";
-    document.getElementById( "join-room-overlay" ).style.display = "inline-block";
-}
-
 function checkForUserName(){
     var input = document.getElementById( "username-input" );
+    console.log(input.value);
     var username = input.value;
     if(username == ""){
         input.placeholder = "Enter Username";
@@ -139,22 +81,8 @@ function checkForUserName(){
 }
 
 function back(){
-    switch(backFrom){
-        case "multiplayer":
-            document.getElementById( "online-overlay" ).style.display = "none";
-            document.getElementById( "main-overlay" ).style.display = "inline-block";
-            break;
-        case "create":
-            document.getElementById( "create-room-overlay" ).style.display = "none";
-            document.getElementById( "online-overlay" ).style.display = "inline-block";
-            backFrom = "multiplayer";
-            break;
-        case "join":
-            document.getElementById( "join-room-overlay" ).style.display = "none";
-            document.getElementById( "online-overlay" ).style.display = "inline-block";
-            backFrom = "multiplayer";
-            break;
-    }
+    document.getElementById( "online-overlay" ).style.display = "none";
+    document.getElementById( "main-overlay" ).style.display = "inline-block";
 }
 
 
@@ -181,9 +109,8 @@ function toggleEndTurnButton( show ){
 
 function endTurn(){
     if(endingTurn) return;
-    if(selected == undefined) return;   
+    if(selected == undefined) return;//TODO: inform player a cube must be selected
     endingTurn = true;
-    //FIXME: don't allow a player to end their turn without selecting a cube 
     selected.material.transparent = false;
     selected.isSelectable = false;
     var num = selected.number;
@@ -199,10 +126,6 @@ function endTurn(){
         switch(playmode){
             case SINGLEPLAYER:
                 break;
-            case LOCALMULTIPLAYER:
-                document.getElementById( "turn-display" ).innerHTML = gameState.currentPlayer == 0 ? "Player One's Turn" : "Player Two's Turn";
-                document.getElementById( "turn-display" ).style.color = convertColor( gameState.playerColors[gameState.currentPlayer] );
-                break;
             case ONLINEMULTIPLAYER:
                 setLastSelected( gameState.roomNumber, num );
                 //Toggle player control
@@ -216,12 +139,17 @@ function endTurn(){
 }
 
 function gameOver( ){
-    console.log("There is a winner");
-
     controls.enabled = false;
     isPlaying = false;
     //TODO: ease the vertical rotation of the camera
-    //TODO: add reset button (maybe play again and main menu)
+
+    //TODO: finish this
+    switch(playmode){
+        case SINGLEPLAYER:
+            break;
+        case ONLINEMULTIPLAYER:
+            break;
+    }
 }
 
 function detectWinConditions( latestSelected, player ){
@@ -244,13 +172,11 @@ function detectWinConditions( latestSelected, player ){
     var winner = -1;
     for(var i=24; i>=21; i--){
         if(plusMinus[i] + plusMinus[24-i] >= 3){
-            console.log("WINNER");
             winner = i;
         }
     }
     for(var i=20; i>=13; i--){
         if(plusMinus[i] + plusMinus[20-i + 5] >= 3){
-            console.log("WINNER2");
             winner = i;
         }
     }
