@@ -229,6 +229,7 @@ function endTurn(){
                     endingTurn == false;
                     console.log("running AI turn");
                     aiTurn();
+                    return;
                 }
                 break;
             case LOCALMULTIPLAYER:
@@ -358,6 +359,20 @@ function mouseInteractionHandler( event ) {
         selected.material.color.set( gameState.playerColors[gameState.currentPlayer] );
     }
 
+}
+
+function selectViaNumber(number){
+    console.log("selectViaNumber: " + number);
+    if(selected != null){
+        selected.material.color.set( 0x333333 );
+    }
+    selected = scene.children.find(function(child){
+        if(child.number){
+            if(child.number == number) return true;
+        }
+        return false;
+    });
+    selected.material.color.set( gameState.playerColors[gameState.currentPlayer] );
 }
 
 initialSetup();
