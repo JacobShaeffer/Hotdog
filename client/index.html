@@ -8,10 +8,7 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
 		<!-- External dependancies -->
-		<script src="https://www.gstatic.com/firebasejs/4.6.2/firebase-app.js"></script>
-		<script src="https://www.gstatic.com/firebasejs/4.6.2/firebase-auth.js"></script>
-		<script src="https://www.gstatic.com/firebasejs/4.6.2/firebase-database.js"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 		<script src="/socket.io/socket.io.js"></script>
 
@@ -25,7 +22,7 @@
 		<div class="container-fluid">
 
 
-			<div class="row absolute above" style="width: 20%; bottom: 2%;">
+			<div class="row absolute above" style="width: 20%; top: 2%;">
 				<div class="col-md-10">
 					<div>This project is a VERY EARLY Alpha. So please, be kind to it.</div>
 				</div>
@@ -51,12 +48,12 @@
 
 			<div class="row overlay absolute above temporary" id="main-overlay">
 				<div class="col-md-4 verticalCenter">
-					<div class="row">
+					<!--div class="row">
 						<div class="col-md-6 col-md-offset-3 horizontalCenter">
 							<button class="link" id="singlePlayer">Single Player</button>
 						</div>
 					</div>
-					<br>
+					<br-->
 					<div class="row">
 						<div class="col-md-6 col-md-offset-3 horizontalCenter">
 							<button class="link" id="onlineMultiplayer">Online Multiplayer</button>
@@ -89,8 +86,8 @@
 					<div class="row">
 						<div class="col-md-6 col-md-offset-3 horizontalCenter">
 							<div class="row">
-								<h4>Rooms</h4>
-								<p style="float: right;" id="pr1">Population</p>
+								<button class="link" id="r1">Join Room</button>
+								<input type="text" placeholder="room number" id="join-room-number"/>
 							</div>
 						</div>
 					</div>
@@ -98,40 +95,17 @@
 					<div class="row">
 						<div class="col-md-6 col-md-offset-3 horizontalCenter">
 							<div class="row">
-								<button class="link" id="r1">Room 1</button>
-								<p style="float: right;" id="pr1">N/A</p>
+								<button class="link" id="r2">Create Room</button>
 							</div>
 						</div>
 					</div>
 					<br>
-					<div class="row">
-						<div class="col-md-6 col-md-offset-3 horizontalCenter">
-							<div class="row">
-								<button class="link" id="r2">Room 2</button>
-								<p style="float: right;" id="pr2">N/A</p>
-							</div>
-						</div>
-					</div>
-					<br>
-					<div class="row">
-						<div class="col-md-6 col-md-offset-3 horizontalCenter">
-							<div class="row">
-								<button class="link" id="r3">Room 3</button>
-								<p style="float: right;" id="pr3">N/A</p>
-							</div>
-						</div>
-					</div>
-					<br>	
 					<div class="row">
 						<div class="col-md-6 col-md-offset-3 horizontalCenter">
 							<button class="link" id="backOnline">Back</button>
 						</div>
 					</div>
 				</div>
-			</div>
-
-			<div class="row overlay absolute above" id="chat">
-
 			</div>
 
 			<div class="row">
@@ -146,17 +120,6 @@
 			</div>
 		</div>
 		
-
-		<script>
-			// Initialize Firebase
-			var config = {
-				apiKey: "AIzaSyBdzWcTxKpoAgngWiEnB2xe4-UI49_hzNE",
-				authDomain: "hotdog-1a035.firebaseapp.com",
-				databaseURL: "https://hotdog-1a035.firebaseio.com",
-				projectId: "hotdog-1a035",
-			};
-			firebase.initializeApp(config);
-		</script>
 		<script src="js/app.js"></script>
 	</body>
 </html>

@@ -10,40 +10,50 @@ var gameState = {};
 var cubeIsSelected = [];
 var autoRotateSpeed = 0.3;
 var endingTurn;
-var socket = io();
 
 function initialSetup(){
     isPlaying = false;
 
-    document.getElementById( "singlePlayer" ).addEventListener( "click", singlePlayerSetup, false );
-    document.getElementById( "onlineMultiplayer" ).addEventListener( "click", multiplayerSelected, false );
-    document.getElementById( "r1" ).addEventListener( "click", () => { tryJoin(1); }, false );
-    document.getElementById( "r2" ).addEventListener( "click", () => { tryJoin(2); }, false );
-    document.getElementById( "r3" ).addEventListener( "click", () => { tryJoin(3); }, false );
-    document.getElementById( "endTurn" ).addEventListener( "click", endTurn, false );
-    document.getElementById( "backOnline" ).addEventListener( "click", back, false );
+    //document.getElementById( "singlePlayer" ).addEventListener( "click", singlePlayerSetup, false );
+    $( "#onlineMultiplayer" ).on( "click", multiplayerSelected);
+    $( "#r1" ).on( "click", () => { join(); });
+    $( "#r2" ).on( "click", () => { create(); });
+    $( "#r3" ).on( "click", () => { join(); });//TODO:remove me
+    $( "#endTurn" ).on( "click", endTurn);
+    $( "#backOnline" ).on( "click", back);
 
-    document.addEventListener( 'click', mouseInteractionHandler, false);
+    $( "#canvas" ).on( 'click', mouseInteractionHandler);
 }
 
 function singlePlayerSetup(){
     return;
-    
 }
 
-function tryJoin( roomNumber ){
+function create(){
+    console.log("create");
     if(!checkForUserName()) return;
-    joinRoom(roomNumber);
+    createRoom();
+}
 
+function join(){
+    console.log("join");
+    if(!checkForUserName()) return;
+    let roomNumber = checkForRoomNumber();
+    if(roomNumber == null) return;
+    joinRoom(roomNumber);
+}
+
+function onCanJoinRoom( roomData, isTurn ){
+    console.log("onCanJoinRoom: " + roomData.roomNumber);
     gameState = {
         currentPlayer: 0,//current player is always 0, show end turn will decide if this player is player 0 or not
         playerColors:[
             0xff0000,//player1 color
             0xffff00,//player2 color
         ],
-        roomNumber: roomNumber,
-        showEndTurn: false,
-        userName: gameState.userName,
+        roomNumber: roomData.roomNumber,
+        showEndTurn: isTurn,
+        playerUserName: gameState.userName
     };
 
     playmode = ONLINEMULTIPLAYER;
@@ -51,9 +61,9 @@ function tryJoin( roomNumber ){
         element.style.display = "none";
     }
     document.getElementById( "online-overlay" ).style.display = "none";
-    toggleEndTurnButton( false );
+    toggleEndTurnButton( isTurn );
     document.getElementById( "start-hidden" ).style.display = "inline-block";
-    //TODO: add appropriate ui elements
+    startPlaying();
 }
 
 function multiplayerSelected(){
@@ -63,6 +73,20 @@ function multiplayerSelected(){
     });
     document.getElementById( "main-overlay" ).style.display = "none";
     document.getElementById( "online-overlay" ).style.display = "inline-block";
+}
+
+function checkForRoomNumber(){
+    var input = document.getElementById( "join-room-number" );
+    console.log("Checking for RoomNumber: " + input.value);
+    var roomNumber = input.value;
+    if(roomNumber == ""){
+        input.placeholder = "Enter RoomNumber";
+        input.style.border = "1px solid #f00";
+        return null;
+    }
+    else {
+        return roomNumber;
+    }
 }
 
 function checkForUserName(){
@@ -83,6 +107,7 @@ function checkForUserName(){
 function back(){
     document.getElementById( "online-overlay" ).style.display = "none";
     document.getElementById( "main-overlay" ).style.display = "inline-block";
+    disconnect();
 }
 
 
@@ -107,6 +132,20 @@ function toggleEndTurnButton( show ){
     }
 }
 
+function selectViaNumber(number){
+    if(selected != null){
+        selected.material.color.set( 0x333333 );
+    }
+    selected = scene.children.find(function(child){
+        if(child.number){
+            if(child.number == number) return true;
+        }
+        return false;
+    });
+    selected.material.color.set( gameState.playerColors[gameState.currentPlayer] );
+}
+
+
 function endTurn(){
     if(endingTurn) return;
     if(selected == undefined) return;//TODO: inform player a cube must be selected
@@ -118,22 +157,24 @@ function endTurn(){
     selected = null;
     
     if(detectWinConditions( num, gameState.currentPlayer )){
-        if(playmode == ONLINEMULTIPLAYER) setLastSelected( gameState.roomNumber, num );
+        if(!gameState.showEndTurn){
+            onGameOver(num);
+        }
         gameOver();
     }
     else{
-        gameState.currentPlayer = gameState.currentPlayer == 0 ? 1 : 0;
-        switch(playmode){
-            case SINGLEPLAYER:
-                break;
-            case ONLINEMULTIPLAYER:
-                setLastSelected( gameState.roomNumber, num );
-                //Toggle player control
-                //toggle value of turn display
-                gameState.showEndTurn = !gameState.showEndTurn;
-                toggleEndTurnButton( gameState.showEndTurn );
-                break;
+        if(!gameState.showEndTurn){
+            onTurnHasEnded(num);
         }
+        gameState.currentPlayer = gameState.currentPlayer == 0 ? 1 : 0;
+        //switch(playmode){
+        //    case SINGLEPLAYER:
+        //        break;
+        //    case ONLINEMULTIPLAYER:
+        gameState.showEndTurn = !gameState.showEndTurn;
+        toggleEndTurnButton( gameState.showEndTurn );
+        //        break;
+        //}
     }
     endingTurn = false;
 }
@@ -249,11 +290,17 @@ function mouseInteractionHandler( event ) {
             selected.material.color.set( 0x333333 );
         }
         selected = intersects[0].object;
+        console.log(JSON.stringify(selected));
         selected.material.color.set( gameState.playerColors[gameState.currentPlayer] );
+        if(gameState.playmode == ONLINEMULTIPLAYER){
+            onHighlight(selected.number);
+        }
     }
 
 }
 
-initialSetup();
-initializeGameBoard();
-animate();
+$(document).ready(function(){
+    initialSetup();
+    initializeGameBoard();
+    animate();
+});

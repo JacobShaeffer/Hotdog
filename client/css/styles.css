@@ -7,6 +7,10 @@ canvas {
     position: absolute;
 }
 
+button {
+    border-radius: 3px;
+}
+
 button.link {
     background: none;
     border: 1px solid gray;
@@ -146,4 +150,14 @@ button.gameUI {
 #username-input {
     width: 150px;
     border: 1px solid #999;
+}
+
+#chat-box{
+    display: none;
+    bottom: 3px;
+    border: 1px solid black;
+}
+#chat-text{
+    height: 200px;
+    overflow: auto;
 }
