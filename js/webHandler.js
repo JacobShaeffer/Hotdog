@@ -2,7 +2,7 @@
 var database;
 var lastCube;
 
-function createRoom( public ){
+function createRoom(){
     //create listener on players and appState
     console.log("creating room");
     getUsedRooms(( inuse ) => {
@@ -10,7 +10,6 @@ function createRoom( public ){
         findUsableRoom( inuse, ( roomNumber ) => {
             console.log("created room " + roomNumber);
             database.ref( 'rooms/' + roomNumber ).set({
-                public: public,
                 appState: {
                     lastSelected: -1,
                     playerOne: -1,
@@ -62,17 +61,24 @@ function createRoom( public ){
     });
 }
 
-function createPublicRoom(){
-    createRoom( true );
+function checkRoomExists( roomNumber ){
+    let ref = database.ref( 'rooms/');
+    let retme;
+    ref.on('value', function(snapshot){
+        if(snapshot.hasChild(roomNumber.toString())){
+            console.log("exists");
+            joinRoom(roomNumber);
+        }
+        else{   
+            console.log("does not exist");
+            alert("room does not exist");
+        }
+    });
 }
-
-function createPrivateRoom(){
-    createRoom( false );
-}
-
-
 
 function joinRoom( roomNumber ){
+
+    document.getElementById( "online-overlay" ).style.display = "none";
     currentPlayer = Math.floor(Math.random() * 2);
 
     var lastSelectedRef = database.ref( 'rooms/' + roomNumber +'/appState/lastSelected' );
@@ -90,17 +96,6 @@ function joinRoom( roomNumber ){
         
         startPlaying();
     });
-}
-
-function joinSelectedRoom(){
-    joinRoom( document.getElementById("room-number-input").value );
-}
-
-/**
- * 
- */
-function joinRandomRoom(){
-
 }
 
 /**
@@ -122,7 +117,7 @@ function getOpenRooms( callback ){
  * @return {Array} list of rooms that are currently used
  */
 function getUsedRooms( callback ){
-    database.ref('openRooms/').once( 'value' ).then((snapshot) =>{
+    database.ref('inuseRooms/').once( 'value' ).then((snapshot) =>{
         var numbersInUse = [];
         snapshot.forEach( (childSnap) => {
             numbersInUse.push(childSnap.key);
@@ -208,4 +203,8 @@ function setUpOnlineTitle( firstName, secondName, who ){
             name2.style.color = gameState.showEndTurn ? "red" : "yellow";
             break;
     }
+}
+
+function clearAllRooms(){
+    //TODO: delete all of the rooms on the server
 }

@@ -2,6 +2,7 @@
 //medium: 50%  best, 30% mediocre, 20% worst
 //hard:   100% best, 
 var difficulty;
+var testing;
 
 function initializeAi( setDifficulty ){
     difficulty = setDifficulty;
@@ -20,15 +21,15 @@ function aiTurn(){
         }
         child[i]++;
         var gameState = []
-        gameState.push(getCubeNumber( isCubeSelectable, i ));
-        console.log(JSON.stringify(gameState));
+        gameState.push(getCubeNumber( i ));
+        //console.log(JSON.stringify(gameState));
         moves.push({number: i, value: alphabeta( child, gameState, DEPTH, -Infinity, Infinity, true)})
     }
     //var x = (moves.number % 5.0 - 2) * 2.0;
     //var y = (isCubeSelectable[i] - 2) * 2.0;
     //var z = (Math.floor(moves.number / 5.0) - 2) * 2.0;
     //endTurn();
-    console.log(JSON.stringify(moves));
+    //console.log(JSON.stringify(moves));
     moves.sort(function(a, b){
         if(a.value < b.value)
             return 1;
@@ -36,12 +37,14 @@ function aiTurn(){
             return -1;
         return 0;
     });
+    console.log(moves);
+    console.log(25 * (isCubeSelectable[moves[0].number] - 1));
     selectViaNumber(moves[0].number);
-
+    aiEndTurn();
 }
 
 function alphabeta( child, gameState, depth, alpha, beta, isMaximizingPlayer ){
-    console.log(JSON.stringify(gameState));
+    //console.log(JSON.stringify(gameState));
     if(depth == 0) return heuristic( gameState );
 
     if(isMaximizingPlayer){
@@ -82,13 +85,14 @@ function alphabeta( child, gameState, depth, alpha, beta, isMaximizingPlayer ){
     }
 }
 
-function getCubeNumber( isCubeSelectable, index ){
+function getCubeNumber( index ){
     var yValue = isCubeSelectable[index];//A value ranging from 0 to 4
     var xzMapedValue = index;//a value ranging from 0 to 24 mapping the to cubes in the xz plane
     return (yValue * 25) * xzMapedValue;
 }
 
 function heuristic( gameState ){
+    testing = gameState;
     return Math.floor(Math.random()*2001 - 1000);
 }
 

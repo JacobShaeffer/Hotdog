@@ -104,7 +104,13 @@ function addCube( number, scene ){
     scene.add( mesh );
 
     if(playmode == SINGLEPLAYER){
-        isCubeSelectable[number % 5]++;
+        if(number >= 25){
+            isCubeSelectable[number % 5]++;
+        }
+        else{
+            isCubeSelectable[number]++;
+        }
+        console.log(number, isCubeSelectable);
     }
 }
 
