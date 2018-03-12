@@ -93,8 +93,40 @@ function joinRoom( roomNumber ){
 }
 
 function joinSelectedRoom(){
-    joinRoom( document.getElementById("room-number-input").value );
+    let roomNumber = checkForRoomNumber();
+    if(roomNumber == false) return;
+    checkRoomExists(roomNumber);
+    
+    //joinRoom( document.getElementById("room-number-input").value );
 }
+
+function checkForRoomNumber(){
+    var input = document.getElementById( "room-number-input" );
+    var roomNumber = input.value;
+    if(roomNumber == ""){
+        input.style.border = "1px solid #f00";
+        return false;
+    }
+    else {
+        return parseInt(roomNumber);
+    }
+}
+
+function checkRoomExists( roomNumber ){
+    let ref = database.ref( 'rooms/');
+    let retme;
+    ref.once('value', function(snapshot){
+        if(snapshot.hasChild(roomNumber.toString())){
+            console.log("exists");
+            joinRoom(roomNumber);
+        }
+        else{   
+            console.log("does not exist");
+            alert("room does not exist");
+        }
+    });
+}
+
 
 /**
  * 

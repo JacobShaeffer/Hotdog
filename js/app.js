@@ -140,7 +140,8 @@ function createSelected(){
     if(checkForUserName() == false) return;
     backFrom = "create";
     document.getElementById( "online-overlay" ).style.display = "none";
-    document.getElementById( "create-room-overlay" ).style.display = "inline-block";
+    //document.getElementById( "create-room-overlay" ).style.display = "inline-block";
+    createRoom(false);
 }
 
 function joinSelected(){
