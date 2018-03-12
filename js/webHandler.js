@@ -64,7 +64,7 @@ function createRoom(){
 function checkRoomExists( roomNumber ){
     let ref = database.ref( 'rooms/');
     let retme;
-    ref.on('value', function(snapshot){
+    ref.once('value', function(snapshot){
         if(snapshot.hasChild(roomNumber.toString())){
             console.log("exists");
             joinRoom(roomNumber);
